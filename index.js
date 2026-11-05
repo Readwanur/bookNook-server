@@ -73,7 +73,7 @@ app.post("/books", verifyToken, async (req, res) => {
       parseInt(booksData.copies ?? booksData.totalCopies ?? 1, 10) || 1,
     );
 
-    const newBook = {
+    const newBooks = {
       ...booksData,
       copies: copiesCount,
       totalCopies: copiesCount,
@@ -81,7 +81,7 @@ app.post("/books", verifyToken, async (req, res) => {
       status: copiesCount > 0 ? "Available" : "Not Available",
     };
 
-    const result = await booksCollection.insertOne(newBook);
+    const result = await booksCollection.insertOne(newBooks);
     res.send(result);
   } catch (error) {
     console.error("Error adding book:", error);

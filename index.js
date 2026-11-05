@@ -33,6 +33,26 @@ const db = connectClient.db("bookNook");
 const booksCollection = db.collection("books");
 const booksBorrowCollection = db.collection("booksBorrow");
 
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .send({ error: "Unauthorized access: No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res
+        .status(403)
+        .send({ error: "Forbidden access: Invalid or expired token" });
+    }
+    req.user = decoded;
+    next();
+  });
+};
+
 // Issue JWT Token
 app.post("/jwt", async (req, res) => {
   const { email, name } = req.body;

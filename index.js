@@ -1,7 +1,7 @@
-import express from "express";
-import "dotenv/config";
 import cors from "cors";
-import { MongoClient } from "mongodb";
+import "dotenv/config";
+import express from "express";
+import { MongoClient, ObjectId } from "mongodb";
 
 const app = express();
 const PORT = 5000;
@@ -23,6 +23,7 @@ export async function connectToMongoDB() {
 const connectClient = await connectToMongoDB();
 const db = connectClient.db("bookNook");
 const booksCollection = db.collection("books");
+const booksBorrowCollection = db.collection("booksBorrow");
 
 app.post("/books", async (req, res) => {
   const booksData = req.body;
@@ -32,6 +33,18 @@ app.post("/books", async (req, res) => {
 
 app.get("/books", async (req, res) => {
   const result = await booksCollection.find().toArray();
+  res.send(result);
+});
+
+app.get("/books/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await booksCollection.findOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
+
+app.post("/my-borrows", async (req, res) => {
+  const borrowData = req.body;
+  const result = await booksBorrowCollection.insertOne(borrowData);
   res.send(result);
 });
 
